@@ -72,6 +72,62 @@ categoryRouter.post('/', authenticateToken, async (req, res) => {
     }
 });
 
+
+
+categoryRouter.put('/',authenticateToken, async (req,res)=>{
+    const role=req.user.role
+    if(role=='Admin'){
+    const {category,parent,description}=req.body.item;
+    try{
+        if(parent){
+            console.log(parent);
+            const p = await Categories.find({name:parent});
+            if(p){
+                console.log(p);
+                const c = await SubCategories.findOneAndUpdate({$or:[
+                    {parent_id:p._id},
+                    {name:category},
+                    {description}
+                ]},{
+                    parent_id:p._id,
+                    name:category,
+                    description
+                });
+            if(c){
+                console.log(c);
+                return res.status(201).json({message:'updated'})
+            }
+            return res.status(409).json({error:'No Subcategory found'})
+            }
+            return res.status(409).json({error:'No Parent category found'})
+        }else{
+            const c = await Categories.findOneAndUpdate({$or:[
+                {name:category},
+                {description}
+            ]},{
+                name:category,
+                description
+            })
+            if(c){
+                
+                return res.status(201).json({message:'updated'})
+            }
+            return res.status(409).json({error:'No category found'})
+        }
+    }
+    catch(e){
+        console.log(e);
+    }
+    }
+    else{
+        return res.status(403).json({error:'You need to be an admin to edit Categories'});
+    }
+
+})
+
+
+
+
 categoryRouter.get('/', authenticateToken, async (req, res) => {
     try {
         const categories = await Categories.find({});

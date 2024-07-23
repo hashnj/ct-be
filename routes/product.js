@@ -78,15 +78,20 @@ ProductRouter.post('/add', async (req, res) => {
 ProductRouter.put('/',authenticateToken,async ( req , res ) => {
     const {name,description,mrp,price,stock,image}=req.body.item;
     try{
-    const updated= await Products.findOneAndUpdate({$or:[{
-        name:name},
-        {description:description
-    }]},
-    name,description,mrp,price,stock);
+    const updated= await Products.findOneAndUpdate({$or:[
+        {name:name},
+        {description:description}
+    ]},{
+        name,
+        description,
+        mrp,
+        price,
+        stock
+    });
     const up=await ProductImages.findOneAndUpdate({
         product_id:updated._id
     },{
-      image_url:image  
+      image_url:image[0] 
     })
     console.log(updated);
     return res.json({yay:"yay"});
