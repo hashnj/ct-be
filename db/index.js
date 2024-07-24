@@ -201,6 +201,18 @@ isDefault:{
   updated_at: Date
 });
 
+const wishListSchema = new mongoose.Schema({
+  user_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Users'
+  },
+  product_id: 
+    [{type: mongoose.Schema.Types.ObjectId,
+    ref: 'Products'
+  }],
+})
+
+
 const Users = mongoose.model('Users', userSchema);
 const Vendors = mongoose.model('Vendors', vendorSchema);
 const Categories = mongoose.model('Categories',categorySchema);
@@ -212,6 +224,7 @@ const OrderItems = mongoose.model('OrderItems', orderItemsSchema);
 const Payment = mongoose.model('Payment', paymentSchema);
 const Review = mongoose.model('Review', reviewsSchema);
 const ShippingAddress = mongoose.model('ShippingAddress', shippingAddressSchema);
+const WishList = mongoose.model('WishList',wishListSchema);
 
 module.exports = {
   Users,
@@ -224,5 +237,6 @@ module.exports = {
   OrderItems,
   Payment,
   Review,
-  ShippingAddress
+  ShippingAddress,
+  WishList
 };
