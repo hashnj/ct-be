@@ -1,5 +1,5 @@
 const express = require('express');
-const { Products, ProductImages, Categories, SubCategories, Vendors, WishList } = require('../db');
+const { Products, ProductImages, Categories, SubCategories, Vendors, WishList, Cart } = require('../db');
 const jwt = require('jsonwebtoken');
 const z = require('zod');
 const authenticateToken = require('../middlewares/auth');
@@ -102,19 +102,53 @@ catch(e){
 })
 
 
+ProductRouter.post('/cart', authenticateToken , async (req,res)=>{
+    try{
+        const body=req.body;
+        const user=req.user;
+        
+        const exists = await Cart.findOne({user_id:user.userId});
+        let qry;
+        if(exists){
+            qry =await Cart.findOneAndUpdate({user_id:user.userId},{product_id:body.list})
+        }
+        else{
+        qry= await Cart.create({user_id:user.userId,product_id:body.list});
+        }
+        console.log(qry);
+        return res.json({qry});
+    }
+    catch(e){
+        console.log(e);
+    }
+})
+
+
+ProductRouter.get('/cart', authenticateToken , async (req,res)=>{
+    try{
+        
+        const user=req.user;
+        
+        const qry= await Cart.find({user_id:user.userId});
+        console.log(qry);
+        return res.json({qry});
+    }
+    catch(e){
+        console.log(e);
+    }
+})
 ProductRouter.post('/wish', authenticateToken , async (req,res)=>{
     try{
         const body=req.body;
         const user=req.user;
-        // console.log(user);
-        // console.log(body);
-        const exists = await WishList.findOne({user_id:user.userId});
+        
+        const exists = await Cart.findOne({user_id:user.userId});
         let qry;
         if(exists){
-            qry =await WishList.findOneAndUpdate({user_id:user.userId},{product_id:body.list})
+            qry =await Cart.findOneAndUpdate({user_id:user.userId},{product_id:body.list})
         }
         else{
-        qry= await WishList.create({user_id:user.userId,product_id:body.list});
+        qry= await Cart.create({user_id:user.userId,product_id:body.list});
         }
         console.log(qry);
         return res.json({qry});

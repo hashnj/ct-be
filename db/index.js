@@ -212,6 +212,17 @@ const wishListSchema = new mongoose.Schema({
   }],
 })
 
+const cartSchema = new mongoose.Schema({
+  user_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Users'
+  },
+  product_id: 
+    [{type: mongoose.Schema.Types.ObjectId,
+    ref: 'Products'
+  }],
+})
+
 
 const Users = mongoose.model('Users', userSchema);
 const Vendors = mongoose.model('Vendors', vendorSchema);
@@ -225,6 +236,7 @@ const Payment = mongoose.model('Payment', paymentSchema);
 const Review = mongoose.model('Review', reviewsSchema);
 const ShippingAddress = mongoose.model('ShippingAddress', shippingAddressSchema);
 const WishList = mongoose.model('WishList',wishListSchema);
+const Cart = mongoose.model('Cart', cartSchema);
 
 module.exports = {
   Users,
@@ -238,5 +250,6 @@ module.exports = {
   Payment,
   Review,
   ShippingAddress,
-  WishList
+  WishList,
+  Cart
 };
