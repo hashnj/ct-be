@@ -1,20 +1,13 @@
 const express = require('express');
 const { Users, Vendors  } = require('../db');
 const jwt = require('jsonwebtoken');
-const z = require('zod');
+const { userValidationSchema , loginValidationSchema } = require('../zod/user')
 
 const userRouter = express.Router();
 
 const jwt_secret = 'secret';
 
-const userValidationSchema = z.object({
-    userName: z.string().min(1, { message: "Name is required" }),
-    email: z.string().email({ message: "Invalid email address" }),
-    phone: z.string().min(10,{message:"minimum 10 required"}),
-    password: z.string().min(6, { message: "Password must be at least 6 characters long" }),
-    role:z.string().optional(),
-    address:z.string().optional()
-});
+
 
 userRouter.post('/signup', async (req, res) => {
     const body = req.body;
@@ -94,12 +87,12 @@ userRouter.post('/signup', async (req, res) => {
     }
 });
 
-const loginValidationSchema = z.object({
-    email: z.string().email({ message: "Invalid email address" }).optional(),
-    userName:z.string().optional(),
-    phone:z.string().optional(),
-    password: z.string().min(6, { message: "Password must be at least 6 characters long" }),
-}).refine(data => !!(data.email || data.userName || data.phone), { message: "Either email, username, or phone is required" });
+// const loginValidationSchema = z.object({
+//     email: z.string().email({ message: "Invalid email address" }).optional(),
+//     userName:z.string().optional(),
+//     phone:z.string().optional(),
+//     password: z.string().min(6, { message: "Password must be at least 6 characters long" }),
+// }).refine(data => !!(data.email || data.userName || data.phone), { message: "Either email, username, or phone is required" });
 
 userRouter.post('/login', async (req, res) => {
     const validationResult = loginValidationSchema.safeParse(req.body);
