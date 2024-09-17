@@ -210,18 +210,27 @@ const wishListSchema = new mongoose.Schema({
     [{type: mongoose.Schema.Types.ObjectId,
     ref: 'Products'
   }],
-})
+});
 
 const cartSchema = new mongoose.Schema({
   user_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Users'
   },
-  product_id: 
-    [{type: mongoose.Schema.Types.ObjectId,
-    ref: 'Products'
+  products: 
+    [{
+      product_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Products'
+      },
+      quantity: {
+        type:Number,
+        required:true,
+        default:1,
+        min:1
+      }
   }],
-})
+});
 
 
 const Users = mongoose.model('Users', userSchema);

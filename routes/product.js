@@ -79,11 +79,14 @@ ProductRouter.post('/cart', authenticateToken, async (req, res) => {
     try {
         const { list } = req.body;
         const { userId } = req.user;
+        console.log(list)
         
         const exists = await Cart.findOne({ user_id: userId });
         const qry = exists
-            ? await Cart.findOneAndUpdate({ user_id: userId }, { product_id: list })
-            : await Cart.create({ user_id: userId, product_id: list });
+            ? 
+            await Cart.findOneAndUpdate({ user_id: userId }, { products: list } )
+            : 
+            await Cart.create({ user_id: userId, products: list });
 
         res.json({ qry });
     } catch (error) {
