@@ -1,7 +1,8 @@
 const express = require('express');
-const { Users, Vendors  } = require('../db');
+const { Users, Vendors, ShippingAddress  } = require('../db');
 const jwt = require('jsonwebtoken');
-const { userValidationSchema , loginValidationSchema } = require('../zod/user')
+const { userValidationSchema , loginValidationSchema } = require('../zod/user');
+const authenticateToken = require('../middlewares/auth');
 
 const userRouter = express.Router();
 
@@ -192,6 +193,36 @@ userRouter.post('/auth', async (req, res) => {
         }
     }
 });
+
+
+userRouter.post('/address', authenticateToken , async (req,res) => {
+    try{
+        const {address,pin,city,state,country} = req.body;
+        const userId = req.user.userId;
+        console.log(userId);
+        try{
+            const exists = await ShippingAddress.findOne( {ref:address, postal_code:pin, city, state, country, user_id:userId});
+            if (exists) {
+                return res.status(409).json({ error: "Address already Saved" });
+            }
+
+            const addres = await ShippingAddress.create({ ref:address, postal_code:pin, city, state, country, user_id:userId });
+            console.log(addres);
+        }
+        catch(e){
+            console.log(e);
+        }
+        if(true){
+            res.json({success:"W"});
+        }
+        else{
+            res.status(400).json({error:'L'})
+        }
+    }
+    catch(e){
+        console.log(e);
+    }
+})
 
 
 
