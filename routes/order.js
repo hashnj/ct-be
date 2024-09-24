@@ -34,16 +34,7 @@ OrderRouter.post('/buy', authenticateToken, async (req, res) => {
     });
 
 
-    const shippingAddress = await ShippingAddress.create({
-      user_id: userId,
-      order_id: newOrder._id,
-      address_type: 'Home', 
-      ref: address.address,
-      city: address.city,
-      state: address.state,
-      postal_code: address.postal_code,
-      country: address.country,
-    });
+    
 
     const payment = await Payment.create({
       order_id: newOrder._id,
@@ -60,7 +51,6 @@ OrderRouter.post('/buy', authenticateToken, async (req, res) => {
       order: newOrder,
       orderItem: newOrderItem,
       payment,
-      shippingAddress,
     });
 
   } catch (error) {
