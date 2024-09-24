@@ -5,6 +5,7 @@ const { Users, Products, Categories, OrderItems, Review, SubCategories, Shipping
 const ProductRouter = require('./routes/product');
 const categoryRouter = require('./routes/category');
 const authenticateToken = require('./middlewares/auth');
+const OrderRouter = require('./routes/order');
 
 const app=express();
 
@@ -12,6 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/user',userRouter);
+app.use('/order',OrderRouter);
 app.use('/products',ProductRouter);
 app.use('/categories',categoryRouter);
 app.post('/data',authenticateToken,async (req,res)=>{
