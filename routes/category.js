@@ -29,7 +29,8 @@ categoryRouter.post('/', authenticateToken, async (req, res) => {
             const subCategory = await SubCategories.create({
                 name: body.category.name,
                 description: body.category.description,
-                parent_id: parentCategory._id
+                parent_id: parentCategory._id,
+                cat_img:body.category.cat_img
             });
 
             return res.status(201).json({ created: `${subCategory.name} subcategory` });
@@ -47,7 +48,8 @@ categoryRouter.post('/', authenticateToken, async (req, res) => {
 
             const category = await Categories.create({
                 name: body.category.name,
-                description: body.category.description
+                description: body.category.description,
+                cat_img:body.category.cat_img
             });
 
             return res.status(201).json({ created: `${category.name} category` });
@@ -63,7 +65,7 @@ categoryRouter.post('/', authenticateToken, async (req, res) => {
 categoryRouter.put('/',authenticateToken, async (req,res)=>{
     const role=req.user.role
     if(role=='Admin'){
-    const {category,parent,description}=req.body.item;
+    const {category,parent,description,cat_img}=req.body.item;
     try{
         if(parent){
             console.log(parent);
@@ -73,11 +75,13 @@ categoryRouter.put('/',authenticateToken, async (req,res)=>{
                 const c = await SubCategories.findOneAndUpdate({$or:[
                     {parent_id:p._id},
                     {name:category},
-                    {description}
+                    {description},
+                    {cat_img}
                 ]},{
                     parent_id:p._id,
                     name:category,
-                    description
+                    description,
+                    cat_img
                 });
             if(c){
                 console.log(c);
@@ -89,10 +93,12 @@ categoryRouter.put('/',authenticateToken, async (req,res)=>{
         }else{
             const c = await Categories.findOneAndUpdate({$or:[
                 {name:category},
-                {description}
+                {description},
+                {cat_img}
             ]},{
                 name:category,
-                description
+                description,
+                cat_img
             })
             if(c){
                 

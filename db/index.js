@@ -78,6 +78,7 @@ const productImagesSchema = new mongoose.Schema({
 const categorySchema = new mongoose.Schema({
     name: String,
     description: String,
+    cat_img:String,
     created_at: {
         type: Date,
         default: Date.now
@@ -88,6 +89,7 @@ const categorySchema = new mongoose.Schema({
 const subCategorySchema=new mongoose.Schema({
     name:String,
     description:String,
+    cat_img:String,
     parent_id:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Categories'
