@@ -40,44 +40,44 @@ const vendorSchema = new mongoose.Schema({
   updated_at: Date
 });
 
+// const productSchema = new mongoose.Schema({
+//   vendor_id: { 
+//     type: mongoose.Schema.Types.ObjectId,
+//     ref: 'Vendors'
+//   },
+//   category_id: {
+//       type: mongoose.Schema.Types.ObjectId,
+//       ref: 'Categories'
+//   },
+//   name: String,
+//   description: String,
+//   mrp:String,
+//   price: String,
+//   stock: String,
+//   created_at: {
+//       type: Date,
+//       default: Date.now
+//   },
+//   updated_at: Date
+// });
+
 const productSchema = new mongoose.Schema({
   vendor_id: { 
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Vendors'
-  },
+              type: mongoose.Schema.Types.ObjectId,
+              ref: 'Vendor', 
+                },
   category_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Categories'
-  },
-  name: String,
-  description: String,
-  mrp:String,
-  price: String,
-  stock: String,
-  created_at: {
-      type: Date,
-      default: Date.now
-  },
-  updated_at: Date
+               type: mongoose.Schema.Types.ObjectId,
+               ref: 'Category', 
+              },
+  name: { type: String, required: true },
+  description: { type: String },
+  mrp: { type: String, required: true },
+  price: { type: String, required: true },
+  stock: { type: String, required: true },
+  orderSizes: [{ type: String }], 
+  dividingCriteria: [{ key: String, values: [String] }] 
 });
-
-// const productSchema = new mongoose.Schema({
-//   name: { type: String, required: true },
-//   description: { type: String },
-//   category_id: {
-//                type: mongoose.Schema.Types.ObjectId,
-//                ref: 'Category', 
-//               },
-//   vendor_id: { 
-//               type: mongoose.Schema.Types.ObjectId,
-//               ref: 'Vendor', 
-//             },
-//   mrp: { type: String, required: true },
-//   price: { type: String, required: true },
-//   stock: { type: String, required: true },
-//   orderSizes: [{ type: String }], 
-//   dividingCriteria: [{ key: String, values: [String] }] 
-// });
 
 const productImagesSchema = new mongoose.Schema({
     product_id: {

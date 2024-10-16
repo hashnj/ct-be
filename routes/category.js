@@ -8,115 +8,146 @@ const categoryRouter = express.Router();
 
 const jwt_secret = 'secret';
 
-categoryRouter.post('/', authenticateToken, async (req, res) => {
-    const body = req.body;
-    // console.log(body);
+// categoryRouter.post('/', authenticateToken, async (req, res) => {
+//     const body = req.body;
+//     // console.log(body);
+
+//     try {
+//         if(body.category.isSubCategory){
+//             const result = SubCategorySchema.safeParse(body.category);
+//             if (!result.success){
+//                 return res.status(400).json({"error":result.error.errors,"no":"no"});
+//             }
+
+//             const parentName = body.category.parent;
+//             const parentCategory = await Categories.findOne({ name: parentName });
+
+//             if (!parentCategory) {
+//                 return res.status(404).json({ error: 'Parent category not found' });
+//             }
+
+//             const subCategory = await SubCategories.create({
+//                 name: body.category.name,
+//                 description: body.category.description,
+//                 parent_id: parentCategory._id,
+//                 cat_img:body.category.cat_img
+//             });
+
+//             return res.status(201).json({ created: `${subCategory.name} subcategory` });
+//         }
+//         else if (!body.category.isSubCategory) {
+//             const result = CategorySchema.safeParse(body.category);
+//             if (!result.success) {
+//                 return res.status(400).json(result.error.errors);
+//             }
+
+//             const find = await Categories.findOne({ name: body.category.name });
+//             if (find) {
+//                 return res.status(409).json('Category already exists');
+//             }
+
+//             const category = await Categories.create({
+//                 name: body.category.name,
+//                 description: body.category.description,
+//                 cat_img:body.category.cat_img
+//             });
+
+//             return res.status(201).json({ created: `${category.name} category` });
+//         }
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: 'Internal Server Error' });
+//     }
+// });
+
+
+
+// categoryRouter.put('/',authenticateToken, async (req,res)=>{
+//     const role=req.user.role
+//     if(role=='Admin'){
+//     const {category,parent,description,cat_img}=req.body.item;
+//     try{
+//         if(parent){
+//             // console.log(parent);
+//             const p = await Categories.find({name:parent});
+//             if(p){
+//                 // console.log(p);
+//                 const c = await SubCategories.findOneAndUpdate({$or:[
+//                     {parent_id:p._id},
+//                     {name:category},
+//                     {description},
+//                     {cat_img}
+//                 ]},{
+//                     parent_id:p._id,
+//                     name:category,
+//                     description,
+//                     cat_img
+//                 });
+//             if(c){
+//                 // console.log(c);
+//                 return res.status(201).json({message:'updated'})
+//             }
+//             return res.status(409).json({error:'No Subcategory found'})
+//             }
+//             return res.status(409).json({error:'No Parent category found'})
+//         }else{
+//             const c = await Categories.findOneAndUpdate({$or:[
+//                 {name:category},
+//                 {description},
+//                 {cat_img}
+//             ]},{
+//                 name:category,
+//                 description,
+//                 cat_img
+//             })
+//             if(c){
+                
+//                 return res.status(201).json({message:'updated'})
+//             }
+//             return res.status(409).json({error:'No category found'})
+//         }
+//     }
+//     catch(e){
+//         // console.log(e);
+//     }
+//     }
+//     else{
+//         return res.status(403).json({error:'You need to be an admin to edit Categories'});
+//     }
+
+// })
+
+
+categoryRouter.post('/add', authenticateToken, async (req, res) => {
+    const { category } = req.body;
 
     try {
-        if(body.category.isSubCategory){
-            const result = SubCategorySchema.safeParse(body.category);
-            if (!result.success){
-                return res.status(400).json({"error":result.error.errors,"no":"no"});
-            }
-
-            const parentName = body.category.parent;
-            const parentCategory = await Categories.findOne({ name: parentName });
-
-            if (!parentCategory) {
-                return res.status(404).json({ error: 'Parent category not found' });
-            }
-
-            const subCategory = await SubCategories.create({
-                name: body.category.name,
-                description: body.category.description,
-                parent_id: parentCategory._id,
-                cat_img:body.category.cat_img
-            });
-
-            return res.status(201).json({ created: `${subCategory.name} subcategory` });
-        }
-        else if (!body.category.isSubCategory) {
-            const result = CategorySchema.safeParse(body.category);
-            if (!result.success) {
-                return res.status(400).json(result.error.errors);
-            }
-
-            const find = await Categories.findOne({ name: body.category.name });
-            if (find) {
-                return res.status(409).json('Category already exists');
-            }
-
-            const category = await Categories.create({
-                name: body.category.name,
-                description: body.category.description,
-                cat_img:body.category.cat_img
-            });
-
-            return res.status(201).json({ created: `${category.name} category` });
-        }
+        const newCategory = await Categories.create(category);
+        res.status(201).json({ message: 'Category added', category: newCategory });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
+// Update Category with Sizes and Criteria
+categoryRouter.put('/update/:id', authenticateToken, async (req, res) => {
+    const { id } = req.params;
+    const { category } = req.body;
 
+    try {
+        const updatedCategory = await Categories.findByIdAndUpdate(id, category, { new: true });
 
-categoryRouter.put('/',authenticateToken, async (req,res)=>{
-    const role=req.user.role
-    if(role=='Admin'){
-    const {category,parent,description,cat_img}=req.body.item;
-    try{
-        if(parent){
-            // console.log(parent);
-            const p = await Categories.find({name:parent});
-            if(p){
-                // console.log(p);
-                const c = await SubCategories.findOneAndUpdate({$or:[
-                    {parent_id:p._id},
-                    {name:category},
-                    {description},
-                    {cat_img}
-                ]},{
-                    parent_id:p._id,
-                    name:category,
-                    description,
-                    cat_img
-                });
-            if(c){
-                // console.log(c);
-                return res.status(201).json({message:'updated'})
-            }
-            return res.status(409).json({error:'No Subcategory found'})
-            }
-            return res.status(409).json({error:'No Parent category found'})
-        }else{
-            const c = await Categories.findOneAndUpdate({$or:[
-                {name:category},
-                {description},
-                {cat_img}
-            ]},{
-                name:category,
-                description,
-                cat_img
-            })
-            if(c){
-                
-                return res.status(201).json({message:'updated'})
-            }
-            return res.status(409).json({error:'No category found'})
+        if (!updatedCategory) {
+            return res.status(404).json({ error: 'Category not found' });
         }
-    }
-    catch(e){
-        // console.log(e);
-    }
-    }
-    else{
-        return res.status(403).json({error:'You need to be an admin to edit Categories'});
-    }
 
-})
-
+        res.status(200).json({ message: 'Category updated', category: updatedCategory });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 
 

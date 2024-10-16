@@ -182,21 +182,38 @@ ProductRouter.get('/wish', authenticateToken, async (req, res) => {
 ProductRouter.get('/', async (req, res) => {
     try {
         const products = await Products.find({})
-                                .populate('category_id', 'name')
-                                .populate('vendor_id', 'business_name');
+            .populate({
+                path: 'category_id',
+                select: 'name description parent_id',
+                populate: { 
+                    path: 'parent_id', 
+                    select: 'name' 
+                } 
+            })
+            .populate('vendor_id', 'business_name address contact'); // Extended vendor details if available
 
         const productsWithImages = await Promise.all(products.map(async (product) => {
             const images = await ProductImages.find({ product_id: product._id });
+            const categoryName = product.category_id?.name;
+            const parentCategoryName = product.category_id?.parent_id?.name || null;
+            
             return {
                 ...product.toObject(),
-                images: images.map(img => img.image_url)
+                category: {
+                    name: categoryName,
+                    parent: parentCategoryName,
+                },
+                vendor: product.vendor_id?.business_name || 'Unknown Vendor',
+                images: images.map(img => img.image_url),
             };
         }));
 
         res.status(200).json({ data: productsWithImages });
     } catch (error) {
+        console.error('Error fetching products:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
 
 module.exports = ProductRouter;
