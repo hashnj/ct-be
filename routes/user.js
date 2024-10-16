@@ -12,7 +12,7 @@ const jwt_secret = 'secret';
 
 userRouter.post('/signup', async (req, res) => {
     const body = req.body;
-    console.log(body);
+    // console.log(body);
 
     const validationResult = userValidationSchema.safeParse(body);
     if (!validationResult.success) {
@@ -35,7 +35,7 @@ userRouter.post('/signup', async (req, res) => {
 
         if (role === 'Vendor') {
         const headers = req.headers.authorization;
-            console.log("headers:"+headers);
+            // console.log("headers:"+headers);
             if (!headers || headers=='') {
                 const exists = await Users.findOne({ email, phone });
                 if (exists) {
@@ -73,7 +73,7 @@ userRouter.post('/signup', async (req, res) => {
                     business_phone: phone,
                     business_address: address
                 });
-                console.log(newVendor);
+                // console.log(newVendor);
 
                 const vendorToken = jwt.sign(newVendor._id.toJSON(), jwt_secret);
                 return res.status(201).json({
@@ -120,7 +120,7 @@ userRouter.post('/login', async (req, res) => {
         } 
         else if (user.role === 'Vendor') {
             const vendor = await Vendors.findOne({ user_id: user._id });
-            console.log(vendor)
+            // console.log(vendor)
             if (vendor) {
                 token = jwt.sign({ userId: vendor._id, role: 'Vendor' }, jwt_secret);
                 res.status(200).json({ token: 'Bearer ' + token });
@@ -199,7 +199,7 @@ userRouter.post('/address', authenticateToken , async (req,res) => {
     try{
         const {address,pin,city,state,country} = req.body;
         const userId = req.user.userId;
-        console.log(userId);
+        // console.log(userId);
         try{
             const exists = await ShippingAddress.findOne( {ref:address, postal_code:pin, city, state, country, user_id:userId});
             if (exists) {
@@ -207,10 +207,10 @@ userRouter.post('/address', authenticateToken , async (req,res) => {
             }
 
             const addres = await ShippingAddress.create({ ref:address, postal_code:pin, city, state, country, user_id:userId });
-            console.log(addres);
+            // console.log(addres);
         }
         catch(e){
-            console.log(e);
+            console.error(e);
         }
         if(true){
             res.json({success:"W"});
@@ -220,7 +220,7 @@ userRouter.post('/address', authenticateToken , async (req,res) => {
         }
     }
     catch(e){
-        console.log(e);
+        console.error(e);
     }
 })
 

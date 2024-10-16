@@ -6,6 +6,7 @@ const ProductRouter = require('./routes/product');
 const categoryRouter = require('./routes/category');
 const authenticateToken = require('./middlewares/auth');
 const OrderRouter = require('./routes/order');
+const ReviewRouter = require('./routes/review');
 
 const app=express();
 
@@ -16,10 +17,11 @@ app.use('/user',userRouter);
 app.use('/order',OrderRouter);
 app.use('/products',ProductRouter);
 app.use('/categories',categoryRouter);
+app.use('/reviews',ReviewRouter);
 app.post('/data',authenticateToken,async (req,res)=>{
     try {
         const userId = req.user.userId;
-        console.log(userId);
+        // console.log(userId);
         const [users,address, products, categories,subCategories, orders, reviews] = await Promise.all([
             Users.find({}),
             ShippingAddress.find({user_id:userId}),
@@ -29,7 +31,7 @@ app.post('/data',authenticateToken,async (req,res)=>{
             OrderItems.find({}),
             Review.find({})
         ]);
-        console.log(users,address, products, categories, orders, reviews);
+        // console.log(users,address, products, categories, orders, reviews);
         return res.json({users, address, products, categories,subCategories, orders, reviews});
     } catch (error) {
         console.error("Error fetching data:", error);

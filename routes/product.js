@@ -7,56 +7,105 @@ const ProductRouter = express.Router();
 
 const jwt_secret = 'secret';
 
-ProductRouter.post('/add', async (req, res) => {
-    const { body, headers } = req;
-    const authHeader = headers.authorization;
-
-    if (!authHeader) {
-        return res.status(401).json('Provide auth key');
-    }
-
-    const token = authHeader.split(' ')[1];
-    let decodedToken;
+ProductRouter.post('/add', authenticateToken, async (req, res) => {
+    const { product } = req.body;
+    const { userId } = req.user;
 
     try {
-        decodedToken = jwt.verify(token, jwt_secret);
-    } catch (err) {
-        return res.status(401).json('Invalid auth key');
-    }
+        const category = await Categories.findById(product.category_id);
 
-    let category_id;
-    try {
-        const category = await Categories.findOne({ name: body.product.category });
-        const subCategory = await SubCategories.findOne({ name: body.product.category });
-
-        if (category) {
-            category_id = category._id;
-        } else if (subCategory) {
-            category_id = subCategory.parent_id;
-        } else {
+        if (!category) {
             return res.status(404).json({ error: 'Category not found' });
         }
 
-        const product = await Products.create({
-            category_id,
-            vendor_id: decodedToken.userId,
-            name: body.product.name,
-            description: body.product.description,
-            mrp: body.product.mrp,
-            price: body.product.price,
-            stock: body.product.stock,
+        const newProduct = await Products.create({
+            ...product,
+            vendor_id: userId,
         });
 
-        const img = await ProductImages.create({
-            product_id: product._id,
-            image_url: body.product.image,
+        await ProductImages.create({
+            product_id: newProduct._id,
+            image_url: product.image,
         });
 
-        res.status(201).json({ product, img });
+        res.status(201).json({ message: 'Product added successfully', product: newProduct });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+// ProductRouter.post('/add', async (req, res) => {
+//     const { body, headers } = req;
+//     const authHeader = headers.authorization;
+
+//     if (!authHeader) {
+//         return res.status(401).json('Provide auth key');
+//     }
+
+//     const token = authHeader.split(' ')[1];
+//     let decodedToken;
+
+//     try {
+//         decodedToken = jwt.verify(token, jwt_secret);
+//     } catch (err) {
+//         return res.status(401).json('Invalid auth key');
+//     }
+
+//     let category_id;
+//     try {
+//         const category = await Categories.findOne({ name: body.product.category });
+//         const subCategory = await SubCategories.findOne({ name: body.product.category });
+
+//         if (category) {
+//             category_id = category._id;
+//         } else if (subCategory) {
+//             category_id = subCategory.parent_id;
+//         } else {
+//             return res.status(404).json({ error: 'Category not found' });
+//         }
+
+//         const product = await Products.create({
+//             category_id,
+//             vendor_id: decodedToken.userId,
+//             name: body.product.name,
+//             description: body.product.description,
+//             mrp: body.product.mrp,
+//             price: body.product.price,
+//             stock: body.product.stock,
+//         });
+
+//         const img = await ProductImages.create({
+//             product_id: product._id,
+//             image_url: body.product.image,
+//         });
+
+//         res.status(201).json({ product, img });
+//     } catch (error) {
+//         res.status(500).json({ error: 'Internal Server Error' });
+//     }
+// });
+
+
+// ProductRouter.put('/update/:id', authenticateToken, async (req, res) => {
+//     const { id } = req.params;
+//     const { product } = req.body;
+
+//     try {
+//         const updatedProduct = await Products.findByIdAndUpdate(id, product, { new: true });
+
+//         if (!updatedProduct) {
+//             return res.status(404).json({ error: 'Product not found' });
+//         }
+
+//         res.status(200).json({ message: 'Product updated', product: updatedProduct });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: 'Internal Server Error' });
+//     }
+// });
+
+
 
 ProductRouter.put('/', authenticateToken, async (req, res) => {
     const { name, description, mrp, price, stock, image } = req.body.item;
@@ -79,7 +128,7 @@ ProductRouter.post('/cart', authenticateToken, async (req, res) => {
     try {
         const { list } = req.body;
         const { userId } = req.user;
-        console.log(list)
+        // console.log(list)
         
         const exists = await Cart.findOne({ user_id: userId });
         const qry = exists
@@ -133,8 +182,8 @@ ProductRouter.get('/wish', authenticateToken, async (req, res) => {
 ProductRouter.get('/', async (req, res) => {
     try {
         const products = await Products.find({})
-            .populate('category_id', 'name')
-            .populate('vendor_id', 'business_name');
+                                .populate('category_id', 'name')
+                                .populate('vendor_id', 'business_name');
 
         const productsWithImages = await Promise.all(products.map(async (product) => {
             const images = await ProductImages.find({ product_id: product._id });

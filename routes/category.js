@@ -10,7 +10,7 @@ const jwt_secret = 'secret';
 
 categoryRouter.post('/', authenticateToken, async (req, res) => {
     const body = req.body;
-    console.log(body);
+    // console.log(body);
 
     try {
         if(body.category.isSubCategory){
@@ -68,10 +68,10 @@ categoryRouter.put('/',authenticateToken, async (req,res)=>{
     const {category,parent,description,cat_img}=req.body.item;
     try{
         if(parent){
-            console.log(parent);
+            // console.log(parent);
             const p = await Categories.find({name:parent});
             if(p){
-                console.log(p);
+                // console.log(p);
                 const c = await SubCategories.findOneAndUpdate({$or:[
                     {parent_id:p._id},
                     {name:category},
@@ -84,7 +84,7 @@ categoryRouter.put('/',authenticateToken, async (req,res)=>{
                     cat_img
                 });
             if(c){
-                console.log(c);
+                // console.log(c);
                 return res.status(201).json({message:'updated'})
             }
             return res.status(409).json({error:'No Subcategory found'})
@@ -108,7 +108,7 @@ categoryRouter.put('/',authenticateToken, async (req,res)=>{
         }
     }
     catch(e){
-        console.log(e);
+        // console.log(e);
     }
     }
     else{

@@ -61,6 +61,24 @@ const productSchema = new mongoose.Schema({
   updated_at: Date
 });
 
+// const productSchema = new mongoose.Schema({
+//   name: { type: String, required: true },
+//   description: { type: String },
+//   category_id: {
+//                type: mongoose.Schema.Types.ObjectId,
+//                ref: 'Category', 
+//               },
+//   vendor_id: { 
+//               type: mongoose.Schema.Types.ObjectId,
+//               ref: 'Vendor', 
+//             },
+//   mrp: { type: String, required: true },
+//   price: { type: String, required: true },
+//   stock: { type: String, required: true },
+//   orderSizes: [{ type: String }], 
+//   dividingCriteria: [{ key: String, values: [String] }] 
+// });
+
 const productImagesSchema = new mongoose.Schema({
     product_id: {
         type: mongoose.Schema.Types.ObjectId,
@@ -161,11 +179,13 @@ const paymentSchema = new mongoose.Schema({
 const reviewsSchema = new mongoose.Schema({
   product_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Products'
+    ref: 'Products',
+    required: true 
   },
   user_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Users'
+    ref: 'Users',
+    required: true 
   },
   rating: Number,
   comment: String,
